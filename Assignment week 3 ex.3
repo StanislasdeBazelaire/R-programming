@@ -1,0 +1,54 @@
+setwd("C:/Users/Stanislas/Datascience/R programming/Assignment3")
+
+rankhospital <- function(state,problem, num = "best") {
+
+## Read outcome data
+outcome<-read.csv("outcome-of-measures.csv",colClasses="character")
+names<-names(outcome)
+names[11]<-c("heart failure")
+names[17]<-c("pneumonia")
+names[23]<-c("heart attack")
+outcome[, 11] <- as.numeric(outcome[, 11])
+outcome[, 17] <- as.numeric(outcome[, 17])
+outcome[, 23] <- as.numeric(outcome[, 23])
+statelist<-as.character(outcome[,7]) 
+
+## Check that state and outcome are valid
+problem<-as.character(problem)
+if (problem%in%names){
+message("valid problem")} else{
+message("invalid problem")
+}
+
+state<-as.character(state)
+if (state%in%statelist){
+message("valid state")} else{
+message("invalid state")
+}
+
+#to get the column number of a disease
+position<-c(17,23,11)
+names(position)<-c("heart failure","pneumonia","heart attack")
+
+#create vector identifying relevant rows with a "1" based on the selected state
+idstate<-as.numeric(outcome[,7]==state)
+
+#vector that keeps the rates from the selected state only when the rate has been provided
+deathratesclean<-as.numeric(outcome[,position[problem]])
+deathratesclean[is.na(deathratesclean)]<-0
+deathrates<-idstate*deathratesclean
+deathratesformin<-deathrates[deathrates>0]
+
+#num best and worst
+if (num=="best") {
+num<-1} else {
+if (num=="worst"){
+num<-length(deathratesformin)}
+}
+
+#look for x-th lowest
+valuenum<-sort(deathratesformin)[num]
+rankhospital<-outcome[,2][which(deathrates==valuenum)]
+print(rankhospital)
+
+}
