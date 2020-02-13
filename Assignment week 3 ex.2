@@ -1,0 +1,36 @@
+setwd("C:/Users/Stanislas/Datascience/R programming/Assignment3")
+
+rankall <- function(problem, num = "best") {
+
+## Read outcome data
+outcome<-read.csv("outcome-of-measures.csv",colClasses="character")
+names<-names(outcome)
+names[11]<-c("heart failure")
+names[17]<-c("pneumonia")
+names[23]<-c("heart attack")
+outcome[, 11] <- as.numeric(outcome[, 11])
+outcome[,11][is.na(outcome[, 11])]<-0
+outcome[, 17] <- as.numeric(outcome[, 17])
+outcome[,17][is.na(outcome[, 17])]<-0
+outcome[, 23] <- as.numeric(outcome[, 23])
+outcome[,23][is.na(outcome[, 23])]<-0
+
+## Check that the problem are valid
+problem<-as.character(problem)
+if (problem%in%names){
+message("valid problem")} else{
+message("invalid problem")
+}
+
+##to get the column number of a disease
+position<-c(17,23,11)
+names(position)<-c("heart failure","pneumonia","heart attack")
+
+
+## For each state, find the hospital of the given rank
+states<-unique(outcome[,7])
+column<-outcome[,position[problem]]
+hospital<-outcome[,2]
+res<-lapply(split(sort(column[column>0]),states),function(x) hospital[which(x[num]==column)])
+}	
+
